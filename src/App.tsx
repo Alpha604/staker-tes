@@ -19,8 +19,10 @@ import { Slide } from './components/Slide';
 import { VideoPoker } from './components/VideoPoker';
 import { Baccarat } from './components/Baccarat';
 import { TomeOfLife } from './components/TomeOfLife';
+import { Stats } from './components/Stats';
+import { LiveSessionWidget } from './components/LiveSessionWidget';
 
-export type ViewType = 'home' | 'originals' | 'mines' | 'roulette' | 'keno' | 'dice' | 'plinko' | 'crash' | 'limbo' | 'wheel' | 'hilo' | 'dragon-tower' | 'flip' | 'slide' | 'video-poker' | 'baccarat' | 'tome-of-life';
+export type ViewType = 'home' | 'originals' | 'mines' | 'roulette' | 'keno' | 'dice' | 'plinko' | 'crash' | 'limbo' | 'wheel' | 'hilo' | 'dragon-tower' | 'flip' | 'slide' | 'video-poker' | 'baccarat' | 'tome-of-life' | 'stats';
 
 export default function App() {
   const [view, setView] = useState<ViewType>('home');
@@ -50,8 +52,10 @@ export default function App() {
               {view === 'video-poker' && <VideoPoker />}
               {view === 'baccarat' && <Baccarat />}
               {view === 'tome-of-life' && <TomeOfLife />}
+              {view === 'stats' && <Stats />}
            </main>
         </div>
+        <LiveSessionWidget />
       </div>
     </UserProvider>
   );

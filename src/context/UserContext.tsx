@@ -3,6 +3,12 @@ import { auth, db, loginWithGoogle, logout } from '../lib/firebase';
 import { onAuthStateChanged, User } from 'firebase/auth';
 import { doc, getDoc, setDoc, updateDoc, onSnapshot, increment } from 'firebase/firestore';
 
+interface SessionBet {
+  game: string;
+  profit: number;
+  timestamp: number;
+}
+
 interface UserContextType {
   user: User | null;
   loading: boolean;
@@ -13,6 +19,10 @@ interface UserContextType {
   subtractBalance: (amount: number) => Promise<boolean>;
   setBalanceExact: (amount: number) => Promise<void>;
   recordBet: (game: string, betAmount: number, multiplier: number, payout: number) => Promise<void>;
+  sessionBets: SessionBet[];
+  resetSession: () => void;
+  showSessionStats: boolean;
+  setShowSessionStats: (show: boolean) => void;
 }
 
 const UserContext = createContext<UserContextType | undefined>(undefined);
@@ -21,6 +31,12 @@ export const UserProvider: React.FC<{ children: React.ReactNode }> = ({ children
   const [user, setUser] = useState<User | null>(null);
   const [loading, setLoading] = useState(true);
   const [balance, setBalance] = useState<number>(0);
+  const [sessionBets, setSessionBets] = useState<SessionBet[]>([]);
+  const [showSessionStats, setShowSessionStats] = useState(false);
+
+  const resetSession = () => {
+    setSessionBets([]);
+  };
 
   useEffect(() => {
     const unsubscribe = onAuthStateChanged(auth, async (currentUser) => {
@@ -140,10 +156,17 @@ export const UserProvider: React.FC<{ children: React.ReactNode }> = ({ children
     }
     
     await updateDoc(userRef, updates).catch(console.error);
+
+    // Save locally to session
+    setSessionBets(prev => [...prev, {
+      game,
+      profit: safePayout - safeBetAmount,
+      timestamp: Date.now()
+    }]);
   };
 
   return (
-    <UserContext.Provider value={{ user, loading, balance, login, logoutUser, addBalance, subtractBalance, setBalanceExact, recordBet }}>
+    <UserContext.Provider value={{ user, loading, balance, login, logoutUser, addBalance, subtractBalance, setBalanceExact, recordBet, sessionBets, resetSession, showSessionStats, setShowSessionStats }}>
       {!loading ? children : <div className="h-screen w-screen flex items-center justify-center bg-bg-base text-accent"><div className="animate-spin text-4xl">💰</div></div>}
     </UserContext.Provider>
   );
