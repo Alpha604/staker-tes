@@ -27,6 +27,7 @@ export function Leaderboard({ onClose }: { onClose: () => void }) {
         setUsers(data);
       } catch (err) {
         console.error(err);
+        // Fallback silently if rules throw permission error (e.g. not signed in)
       } finally {
         setLoading(false);
       }
@@ -71,17 +72,17 @@ export function Leaderboard({ onClose }: { onClose: () => void }) {
                              i === 2 ? <Medal size={16} className="text-amber-600" /> :
                              `#${i + 1}`}
                          </div>
-                         <div className="w-10 h-10 rounded-full bg-indigo-500 flex items-center justify-center text-white font-bold overflow-hidden border border-border-medium shadow">
-                            {u.photoURL ? <img src={u.photoURL} alt={u.displayName} className="w-full h-full object-cover" /> : u.displayName.charAt(0)}
+                         <div className="w-10 h-10 rounded-full bg-indigo-500 flex items-center justify-center text-white font-bold overflow-hidden border border-border-medium shadow shrink-0">
+                            {u.photoURL ? <img src={u.photoURL} alt={u.displayName || 'User'} className="w-full h-full object-cover" /> : (u.displayName?.charAt(0) || 'U')}
                          </div>
                          <div className="flex flex-col">
-                            <span className="font-bold text-white text-sm">{u.displayName}</span>
+                            <span className="font-bold text-white text-sm">{u.displayName || 'Utilisateur Anonyme'}</span>
                             <span className="text-xs text-text-secondary font-mono tracking-tight text-emerald-400">Total Wagered: ${(u.totalWagered || 0).toFixed(2)}</span>
                          </div>
                       </div>
                       
                       <div className="flex items-center gap-2">
-                         <span className="text-white font-black font-mono tracking-tighter">${u.balance.toFixed(2)}</span>
+                         <span className="text-white font-black font-mono tracking-tighter">${(u.balance || 0).toFixed(2)}</span>
                       </div>
                    </div>
                 ))}

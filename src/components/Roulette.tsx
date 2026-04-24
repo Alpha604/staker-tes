@@ -18,7 +18,7 @@ export function Roulette() {
   
   // Bets
   const [bets, setBets] = useState<Record<string, number>>({});
-  const totalBet = Object.values(bets).reduce((a, b) => a + b, 0);
+  const totalBet: number = Object.values(bets).map(x => Number(x)).reduce((a, b) => a + b, 0);
 
   const getColor = (num: number): Color => {
     if (num === 0) return 'green';
@@ -118,6 +118,7 @@ export function Roulette() {
   );
 
   return (
+    <>
     <div className="flex flex-col md:flex-row max-w-[1200px] mx-auto p-4 md:p-8 gap-4 min-h-[calc(100vh-80px)]">
       
       {/* Sidebar Controls (Exact Match) */}
@@ -352,5 +353,7 @@ export function Roulette() {
 
       </div>
     </div>
+    
+    </>
   );
 }

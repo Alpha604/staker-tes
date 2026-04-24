@@ -113,25 +113,30 @@ export const UserProvider: React.FC<{ children: React.ReactNode }> = ({ children
     if (!user) return;
     const userRef = doc(db, 'users', user.uid);
     
+    // Safely parse numbers to avoid Firebase 'unsupported field value' errors with undefined/NaN
+    const safeBetAmount = typeof betAmount === 'number' && !isNaN(betAmount) ? betAmount : 0;
+    const safeMultiplier = typeof multiplier === 'number' && !isNaN(multiplier) ? multiplier : 0;
+    const safePayout = typeof payout === 'number' && !isNaN(payout) ? payout : 0;
+
     // Attempt to record to global bets (fire and forget for UI speed)
     const betId = Math.random().toString(36).substring(2, 11);
     setDoc(doc(db, 'bets', betId), {
       userId: user.uid,
       userName: user.displayName || 'Player',
       game,
-      betAmount,
-      multiplier,
-      payout,
+      betAmount: safeBetAmount,
+      multiplier: safeMultiplier,
+      payout: safePayout,
       timestamp: Date.now()
     }).catch(console.error);
 
     // Update user stats
     const updates: any = {
-      totalWagered: increment(betAmount),
+      totalWagered: increment(safeBetAmount),
       updatedAt: Date.now()
     };
-    if (payout > 0) {
-      updates.totalWon = increment(payout);
+    if (safePayout > 0) {
+      updates.totalWon = increment(safePayout);
     }
     
     await updateDoc(userRef, updates).catch(console.error);

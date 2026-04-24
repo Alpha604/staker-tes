@@ -3,6 +3,7 @@ import { motion, useAnimation } from 'motion/react';
 import { useUser } from '../context/UserContext';
 import { cn } from '../lib/utils';
 import { Coins } from 'lucide-react';
+import { WinPopup } from './WinPopup';
 
 export function Dice() {
   const { user, balance, subtractBalance, addBalance, recordBet } = useUser();
@@ -12,6 +13,7 @@ export function Dice() {
   const [rollResult, setRollResult] = useState<number | null>(50.00);
   const [isRolling, setIsRolling] = useState(false);
   const [lastWin, setLastWin] = useState<boolean | null>(null);
+  const [winInfo, setWinInfo] = useState<{ multiplier: number, payout: number } | null>(null);
 
   const winChance = condition === 'over' ? 100 - target : target;
   const multiplier = Number((99 / winChance).toFixed(4));
@@ -23,6 +25,7 @@ export function Dice() {
     subtractBalance(betAmount);
     setIsRolling(true);
     setLastWin(null);
+    setWinInfo(null);
 
     // Simulate animation delay
     setTimeout(() => {
@@ -38,6 +41,7 @@ export function Dice() {
       const payout = isWin ? potentialWin : 0;
       if (isWin) {
         addBalance(payout);
+        setWinInfo({ multiplier, payout });
       }
       recordBet(
          'Dice',
@@ -100,6 +104,7 @@ export function Dice() {
 
         {/* Right Side: Game Canvas */}
         <div className="md:col-span-9 bg-[#0f172a] relative flex flex-col p-4 md:p-12 overflow-hidden">
+           {winInfo && <WinPopup multiplier={winInfo.multiplier} payout={winInfo.payout} onClose={() => setWinInfo(null)} />}
            
            <div className="flex-1 flex flex-col items-center justify-center relative">
               {/* Dice Track */}

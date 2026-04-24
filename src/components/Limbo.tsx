@@ -3,6 +3,7 @@ import { motion, useAnimation } from 'motion/react';
 import { useUser } from '../context/UserContext';
 import { cn } from '../lib/utils';
 import { Coins, Target } from 'lucide-react';
+import { WinPopup } from './WinPopup';
 
 export function Limbo() {
   const { user, balance, subtractBalance, addBalance, recordBet } = useUser();
@@ -11,6 +12,7 @@ export function Limbo() {
   const [resultMultiplier, setResultMultiplier] = useState<number>(1.00);
   const [isRolling, setIsRolling] = useState(false);
   const [lastWin, setLastWin] = useState<boolean | null>(null);
+  const [winInfo, setWinInfo] = useState<{ multiplier: number, payout: number } | null>(null);
 
   const winChance = Number((99 / targetMultiplier).toFixed(2));
   const potentialWin = betAmount * targetMultiplier;
@@ -33,6 +35,7 @@ export function Limbo() {
     setIsRolling(true);
     setLastWin(null);
     setResultMultiplier(1.00); // Reset visual
+    setWinInfo(null);
 
     let currentVisual = 1.00;
     const finalResult = generateMultiplier();
@@ -52,6 +55,7 @@ export function Limbo() {
          
          if (isWin) {
            addBalance(payout);
+           setWinInfo({ multiplier: targetMultiplier, payout });
          }
          recordBet(
            'Limbo',
@@ -132,6 +136,7 @@ export function Limbo() {
 
         {/* Right Side: Game Canvas */}
         <div className="md:col-span-9 bg-[#0f172a] relative flex flex-col p-4 md:p-12 overflow-hidden justify-center items-center">
+           {winInfo && <WinPopup multiplier={winInfo.multiplier} payout={winInfo.payout} onClose={() => setWinInfo(null)} />}
            
            <div className="flex-1 flex flex-col items-center justify-center relative w-full">
               
@@ -150,7 +155,7 @@ export function Limbo() {
               </motion.div>
 
               {/* Target info below */}
-              <div className="mt-8 text-center text-text-secondary text-lg font-bold flex items-center justify-center gap-4 bg-[#213743] px-6 py-3 rounded-full shadow-inner">
+              <div className="mt-8 text-center text-text-secondary text-lg font-bold flex items-center justify-center gap-4 bg-[#213743] px-6 py-3 rounded-full shadow-inner z-10">
                  <div className="flex items-center gap-2">
                     <Target size={20} className="text-[#ff9800]" />
                     <span>Cible: <span className="text-white">{targetMultiplier.toFixed(2)}×</span></span>
@@ -158,7 +163,7 @@ export function Limbo() {
               </div>
 
               {/* Bottom Info Blocks */}
-              <div className="w-full max-w-lg bg-[#213743] rounded-lg p-2 md:p-4 grid grid-cols-2 gap-2 md:gap-4 mt-auto absolute bottom-4 md:bottom-12">
+              <div className="w-full max-w-lg bg-[#213743] rounded-lg p-2 md:p-4 grid grid-cols-2 gap-2 md:gap-4 mt-auto absolute bottom-4 md:bottom-12 z-10">
                  <div className="bg-[#0f172a] rounded p-3 flex flex-col items-center text-center">
                     <span className="text-text-secondary text-xs md:text-sm font-semibold mb-1">Chances de gain</span>
                     <span className="text-white font-bold text-lg md:text-xl tabular-nums">{winChance}%</span>

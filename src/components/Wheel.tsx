@@ -3,6 +3,7 @@ import { motion, useAnimation } from 'motion/react';
 import { useUser } from '../context/UserContext';
 import { cn } from '../lib/utils';
 import { Coins } from 'lucide-react';
+import { WinPopup } from './WinPopup';
 
 const SEGMENTS = {
   low: [
@@ -34,7 +35,7 @@ export function Wheel() {
   const [isSpinning, setIsSpinning] = useState(false);
   const [rotation, setRotation] = useState(0);
   const controls = useAnimation();
-  const [lastWin, setLastWin] = useState<number | null>(null);
+  const [winInfo, setWinInfo] = useState<{ multiplier: number, payout: number } | null>(null);
 
   const segments = SEGMENTS[risk];
   const numSegments = segments.length;
@@ -45,7 +46,7 @@ export function Wheel() {
     
     subtractBalance(betAmount);
     setIsSpinning(true);
-    setLastWin(null);
+    setWinInfo(null);
 
     // Pick winning index
     const winIndex = Math.floor(Math.random() * numSegments);
@@ -75,7 +76,7 @@ export function Wheel() {
     }
     
     recordBet('Wheel', betAmount, winMultiplier, payout - betAmount);
-    setLastWin(winMultiplier);
+    setWinInfo({ multiplier: winMultiplier, payout });
   };
 
   // Helper to generate SVG pie slices
@@ -188,18 +189,7 @@ export function Wheel() {
         <div className="md:col-span-9 bg-[#0f172a] relative flex flex-col items-center justify-center overflow-hidden p-8">
            
            {/* Win Popup */}
-           {lastWin !== null && (
-               <motion.div 
-                   initial={{ scale: 0, opacity: 0, y: -50 }}
-                   animate={{ scale: 1, opacity: 1, y: -100 }}
-                   className={cn(
-                       "absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 z-30 font-black text-6xl drop-shadow-2xl",
-                       lastWin > 0 ? "text-[#00e676]" : "text-text-secondary"
-                   )}
-               >
-                   {lastWin.toFixed(2)}×
-               </motion.div>
-           )}
+           {winInfo && <WinPopup multiplier={winInfo.multiplier} payout={winInfo.payout} onClose={() => setWinInfo(null)} />}
 
            <div className="relative w-full max-w-[400px] aspect-square flex items-center justify-center">
               {/* Pointer */}

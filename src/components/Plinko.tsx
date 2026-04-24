@@ -3,6 +3,7 @@ import { motion } from 'motion/react';
 import { useUser } from '../context/UserContext';
 import { cn } from '../lib/utils';
 import { Coins } from 'lucide-react';
+import { WinPopup } from './WinPopup';
 
 const MULTIPLIERS = [1000, 130, 26, 9, 4, 2, 0.2, 0.2, 0.2, 0.2, 0.2, 2, 4, 9, 26, 130, 1000];
 const ROWS = 16;
@@ -18,11 +19,13 @@ export function Plinko() {
   const [betAmount, setBetAmount] = useState<number>(10);
   const [balls, setBalls] = useState<Ball[]>([]);
   const containerRef = useRef<HTMLDivElement>(null);
+  const [winInfo, setWinInfo] = useState<{ multiplier: number, payout: number } | null>(null);
   
   const handleDrop = () => {
     if (!user || balance < betAmount) return;
     
     subtractBalance(betAmount);
+    setWinInfo(null);
     
     let currentIndex = 0;
     const path: number[] = [currentIndex];
@@ -59,6 +62,7 @@ export function Plinko() {
          payout - betAmount
        );
        
+       setWinInfo({ multiplier: mult, payout });
        setBalls(prev => prev.filter(b => b.id !== newBall.id));
     }, 2800); // Animation duration
   };
@@ -110,6 +114,7 @@ export function Plinko() {
 
         {/* Right Side: Game Canvas */}
         <div className="md:col-span-9 bg-[#0f172a] relative flex flex-col p-4 md:p-12 overflow-hidden justify-center items-center">
+           {winInfo && <WinPopup multiplier={winInfo.multiplier} payout={winInfo.payout} onClose={() => setWinInfo(null)} />}
            
            <div className="relative w-full max-w-[600px] aspect-[4/3] flex flex-col items-center justify-end" ref={containerRef}>
               

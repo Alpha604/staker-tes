@@ -103,10 +103,9 @@ export function WinPopup({ multiplier, payout, onClose }: WinPopupProps) {
               transition={{ delay: 0.4 }}
               className="flex items-center gap-2"
             >
-              <span className="text-[#00e676] text-xl font-bold font-mono tracking-tight">
-                {payout.toLocaleString('en-US', { minimumFractionDigits: 8, maximumFractionDigits: 8 })}
+              <span className="text-[#00e676] text-2xl font-bold tracking-tight">
+                €{payout.toLocaleString('fr-FR', { minimumFractionDigits: 2, maximumFractionDigits: 2 })}
               </span>
-              <span className="text-emerald-100 font-bold font-mono text-xs leading-none bg-[#00e676] w-6 h-6 flex items-center justify-center rounded-full shrink-0 shadow-sm border border-[#00e676]">T</span>
             </motion.div>
           </motion.div>
         </motion.div>

@@ -156,6 +156,7 @@ export function Mines() {
   };
 
   return (
+    <>
     <div className="flex flex-col md:flex-row gap-4 max-w-[1200px] mx-auto p-4 md:p-8 min-h-[calc(100vh-80px)]">
       
       <div className="w-full md:w-80 bg-bg-panel border border-border-subtle rounded-t-xl md:rounded-l-xl md:rounded-tr-none flex flex-col h-fit order-2 md:order-1 overflow-hidden z-10 shadow-2xl">
@@ -336,5 +337,7 @@ export function Mines() {
         </div>
       </div>
     </div>
+    
+    </>
   );
 }
